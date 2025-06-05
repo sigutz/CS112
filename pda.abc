@@ -1,0 +1,24 @@
+[States]
+q0-initial
+q1
+q2
+q3-accept
+DONE
+
+[Symbols]
+0, 1, epsilon
+DONE
+
+[Stack]
+$, A, B
+DONE
+
+[Transitions]
+# Format: current_state & input_symbol + stack_top > next_state, push symbols
+q0 & epsilon + epsilon > q0, $
+q0 & $ + 1 > q1, A $
+q0 & $ + 0 > q2, B $
+q1 & A + 0 > q3, epsilon
+q2 & B + 1 > q3, epsilon
+
+DONE

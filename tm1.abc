@@ -1,0 +1,21 @@
+[Band]
+1 1 1 1 1 + 1 1 1 1 $
+DONE
+
+[States]
+q0-initial
+q1
+q2-accept
+
+DONE
+[Symbols]
+1, +, s, $
+DONE
+
+[Transitions]
+# Format: current_state & input_symbol > next_state, output_symbol, L/R
+q0 & 1 > q0, 1, R
+q0 & + > q0, 1, R
+q0 & $ > q1, s, L
+q1 & 1 > q2, $, L
+DONE

@@ -1,0 +1,19 @@
+[States]
+q0-initial
+q1
+q2
+q3-accept
+DONE
+
+[Symbols]
+0, 1, epsilon
+DONE
+
+[Transitions]
+q0 + 1 > q1
+q0 + 1 > q2
+q0 + 0 > q2
+q1 + 0 > q3
+q1 + epsilon > q2
+q2 + epsilon > q3
+DONE
