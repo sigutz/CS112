@@ -1,6 +1,8 @@
 # Automata Theory Implementation Project
 
-This project implements various types of automata including DFA (Deterministic Finite Automaton), NFA (Non-deterministic Finite Automaton), PDA (Pushdown Automaton), and Turing Machine. The implementation emphasizes **clear variable naming** and **intuitive transition formats** that make the code easy to understand and maintain.
+CS112 Lab Project
+
+This project implements various types of automata including DFA (Deterministic Finite Automaton), NFA (Non-deterministic Finite Automaton), PDA (Pushdown Automaton), and Turing Machine. The implementation features **intuitive transition formats** and **modular architecture** that make automata theory concepts accessible and easy to work with.
 
 ## Table of Contents
 - [File Format](#file-format)
@@ -10,10 +12,11 @@ This project implements various types of automata including DFA (Deterministic F
 - [PDA Implementation](#pda-implementation)
 - [Turing Machine Implementation](#turing-machine-implementation)
 - [Helper Module](#helper-module)
+- [Project Architecture](#project-architecture)
 
 ## File Format
 
-All automata use a consistent, human-readable file format with clear section markers:
+All automata use a consistent, human-readable file format with structured sections:
 
 ```
 [Section_Name]
@@ -24,10 +27,10 @@ DONE
 ```
 
 ### Key Features:
-- **Clear Section Headers**: Enclosed in square brackets `[States]`, `[Symbols]`, etc.
-- **Section Terminator**: Each section ends with `DONE`
-- **Comments**: Lines starting with `#` are ignored
-- **Flexible Parsing**: The `prep.py` module handles all file parsing uniformly
+- **Structured Sections**: Each component is clearly separated (`[States]`, `[Symbols]`, etc.)
+- **Explicit Terminators**: `DONE` marks the end of each section
+- **Comment Support**: Lines starting with `#` are ignored for documentation
+- **Unified Parsing**: The `prep.py` module handles all file types consistently
 
 ## DFA Implementation
 
@@ -54,28 +57,22 @@ DONE
 ### Key Functions in `dfa.py`
 
 #### `prep_dfa(fdfa)`
-Prepares the DFA by parsing the input file and organizing data into a dictionary with clear keys:
-- `states`: List of all states
-- `init_state`: The initial state
-- `fin_states`: List of accepting states
-- `symbols`: Input alphabet
-- `transitions`: List of transition tuples
+Prepares the DFA by parsing the input file and organizing the automaton components:
+- Extracts states with their properties (initial/accept)
+- Builds the input alphabet
+- Parses transitions into a structured format
+- Returns a complete DFA dictionary
 
 #### `check_dfa(dfa)`
-Validates the DFA by ensuring:
-- All transition states exist in the state list
-- All transition symbols exist in the alphabet
-- The DFA structure is complete and valid
+Validates the DFA structure by ensuring:
+- All referenced states exist
+- All symbols belong to the defined alphabet
+- The automaton is properly formed
 
 #### `run_dfa(fdfa)`
 Offers two execution modes:
-1. **String Mode**: Process an entire string at once
-2. **Interactive Mode**: Process symbol by symbol with visual feedback
-
-**Clear Variable Names**:
-- `current_state`: Tracks the automaton's current position
-- `next_st`: The state to transition to
-- `fin_states`: Final/accepting states
+1. **String Mode**: Process an entire input string and show the path taken
+2. **Interactive Mode**: Step through transitions manually for learning/debugging
 
 ## NFA Implementation
 
@@ -103,33 +100,33 @@ DONE
 ### Key Functions in `nfa.py`
 
 #### `epsilon_closure(nfa, states)`
-Computes the epsilon closure of a set of states:
-- Uses a stack-based approach for efficiency
-- Returns all states reachable via epsilon transitions
-- Essential for NFA simulation
+Implements epsilon closure computation:
+- Uses stack-based algorithm for efficiency
+- Finds all states reachable through epsilon transitions
+- Essential for proper NFA simulation
 
 #### `next_states(nfa, current_states, symbol)`
-Handles non-determinism by:
-- Processing multiple current states simultaneously
-- Returning all possible next states for a given symbol
-- Maintaining the set of active states
+Handles non-deterministic transitions:
+- Processes multiple active states simultaneously
+- Returns all possible successor states
+- Maintains the complete state set during execution
 
 ## NFA to DFA Conversion
 
 ### `nfa2dfa.py` - Subset Construction Algorithm
 
-#### Process Overview:
-1. **Initial State**: Epsilon closure of NFA's initial state
-2. **State Generation**: Each DFA state represents a set of NFA states
-3. **Transition Computation**: For each symbol, compute reachable states
-4. **Accept States**: DFA state is accepting if it contains any NFA accept state
+#### Implementation Approach:
+1. **Starting Point**: Begin with epsilon closure of NFA's initial state
+2. **State Mapping**: Each DFA state represents a set of NFA states
+3. **Systematic Construction**: Build transitions for all state combinations
+4. **Acceptance Criteria**: Mark states containing NFA accept states
 
 #### `nfa2dfa(fnfa)`
-Key implementation details:
-- `state_map`: Maps DFA state names to sets of NFA states
-- `states2process`: Queue of unprocessed state combinations
-- `processed`: Tracks already processed combinations
-- Generates clean DFA state names (q0, q1, q2...)
+The conversion process:
+- Creates a mapping between DFA states and NFA state sets
+- Uses a queue to process new state combinations
+- Generates minimal DFA with clean state naming (q0, q1, q2...)
+- Preserves the language while eliminating non-determinism
 
 ## PDA Implementation
 
@@ -160,29 +157,35 @@ DONE
 ```
 
 ### Intuitive Transition Format
-The PDA uses a **highly readable transition format** that clearly shows:
-- **State & Stack Context**: `q0 & $` - "In state q0 with $ on stack top"
-- **Input Symbol**: `+ 1` - "Reading symbol 1"
-- **Result**: `> q1, A $` - "Go to state q1, push A then $"
+The PDA uses a **highly readable transition format** that clearly expresses the automaton's behavior:
 
-This format is more intuitive than traditional notation because it:
-- Separates concerns clearly (state, stack, input)
-- Uses natural reading order (condition → action)
-- Makes stack operations explicit
+**Format**: `state & stack_top + input > next_state, stack_operations`
+
+This design is more intuitive than traditional notation because:
+- **Logical Grouping**: State and stack conditions are paired with `&`
+- **Clear Input Marking**: The `+` symbol distinctly marks the input
+- **Explicit Stack Operations**: Push/pop operations are clearly listed
+- **Natural Flow**: Reads left-to-right like a rule: "IF in this state AND stack has this WHEN reading this THEN go here and do this"
+
+Example breakdown:
+- `q0 & $ + 1 > q1, A $` means:
+  - IF in state q0 AND $ is on stack top
+  - WHEN reading input 1
+  - THEN transition to q1 and push A then $ onto stack
 
 ### Key Functions in `pda.py`
 
 #### `prep_transitions(ftransitions)`
-Parses the intuitive transition format into tuples:
-```python
-(in_state, stack_top, symbol, next_state, stack_push)
-```
+Parses the intuitive format into computational tuples:
+- Extracts all components of each transition
+- Handles epsilon transitions properly
+- Converts stack operations into list format
 
 #### `epsilon_closure(pda, states_with_stacks)`
-Extended epsilon closure that tracks both states and stack contents:
+Extended epsilon closure for PDAs:
+- Tracks both state and stack contents
 - Handles epsilon transitions that modify the stack
-- Maintains (state, stack) configurations
-- Critical for PDA simulation
+- Maintains complete configurations (state, stack) during closure
 
 ## Turing Machine Implementation
 
@@ -214,51 +217,53 @@ DONE
 ### Key Functions in `turing.py`
 
 #### `run_tm(ftm)`
-Simulates the Turing machine with:
-- **Clear State Tracking**: `current_state`, `current_band`, `pos`
-- **Step-by-step Execution**: Shows each configuration
-- **Termination Conditions**: Accept states or max steps
-- **Visual Output**: Displays tape and head position at each step
+Simulates the Turing machine execution:
+- Tracks tape content and head position
+- Shows step-by-step execution trace
+- Implements proper halting conditions
+- Provides visual feedback of machine state
 
 ## Helper Module
 
 ### `prep.py` - Universal File Parser
 
 #### `prep_file(fname)`
-A flexible parser that:
-- Reads sections marked by `[Section_Name]`
-- Ignores comments (lines starting with `#`)
-- Collects content until `DONE` marker
-- Returns a dictionary mapping section names to content
+A flexible parsing system that:
+- Recognizes section markers `[Section_Name]`
+- Collects content until `DONE` markers
+- Filters out comments for cleaner processing
+- Returns organized data structure for each file type
 
 This unified approach ensures:
-- Consistent file format across all automata types
+- Consistent file handling across all automata
 - Easy extension for new automata types
-- Clean separation of parsing logic
+- Centralized parsing logic
 
-## Project Highlights
+## Project Architecture
 
-### 1. **Clear Variable Naming**
-- `init_state` instead of `q0` or `start`
-- `fin_states` instead of `F` or `final`
-- `current_states` for tracking active states in NFA
-- `stack_push` explicitly names the stack operation
+### 1. **Modular Design**
+- Each automaton type has its own module
+- Shared utilities in `prep.py`
+- Consistent function patterns across modules
+- Easy to extend with new automaton types
 
-### 2. **Intuitive Formats**
-- DFA/NFA transitions: `state + symbol > next_state`
-- PDA transitions: `state & stack + input > next_state, stack_ops`
-- Turing transitions: `state & symbol > next_state, write, direction`
+### 2. **User-Friendly Formats**
+The transition formats prioritize readability:
+- DFA/NFA: `state + symbol > next_state`
+- PDA: `state & stack + input > next_state, stack_ops`
+- Turing: `state & symbol > next_state, write, direction`
 
-### 3. **Modular Design**
-- Separate modules for each automaton type
-- Shared parsing logic in `prep.py`
-- Consistent function naming: `prep_X`, `check_X`, `run_X`
+### 3. **Educational Features**
+- Interactive execution modes
+- Step-by-step trace options
+- Detailed error messages
+- Visual representation of automaton behavior
 
-### 4. **User-Friendly Features**
-- Interactive and batch processing modes
-- Clear error messages with context
-- Visual feedback during execution
-- Step-by-step trace for debugging
+### 4. **Robust Implementation**
+- Input validation at multiple levels
+- Proper handling of edge cases
+- Efficient algorithms (e.g., epsilon closure)
+- Complete automaton checking
 
 ## Usage Examples
 
@@ -266,6 +271,7 @@ This unified approach ensures:
 ```python
 from dfa import run_dfa
 run_dfa("dfa.abc")
+# Choose mode 1 for string checking or mode 2 for interactive
 ```
 
 ### Converting NFA to DFA
@@ -279,14 +285,28 @@ save_dfa(dfa, "converted_dfa.abc")
 ```python
 from pda import run_pda
 run_pda("pda.abc")
+# Enter space-separated input string
 ```
 
 ### Running a Turing Machine
 ```python
 from turing import run_tm
 final_tape, final_state = run_tm("tm1.abc")
+# Watch the step-by-step execution
 ```
 
-## Conclusion
+## Error Handling
 
-This project demonstrates that automata theory implementations can be both theoretically correct and practically readable. The emphasis on clear naming conventions and intuitive formats makes the code accessible to students and researchers alike, while maintaining the mathematical rigor required for formal language processing.
+The project includes comprehensive error checking:
+- **File Format Errors**: Clear messages for malformed input files
+- **Invalid Transitions**: Detection of references to non-existent states/symbols
+- **Runtime Errors**: Graceful handling of invalid inputs during execution
+- **Validation Functions**: Each automaton type has a `check_` function
+
+## Educational Value
+
+This implementation serves as an excellent learning tool:
+1. **Visualization**: See how automata process input step-by-step
+2. **Experimentation**: Easy to modify and test different automata
+3. **Understanding**: Transition formats mirror theoretical notation
+4. **Debugging**: Interactive modes help trace execution paths
